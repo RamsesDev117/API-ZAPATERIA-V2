@@ -1,0 +1,1 @@
+export { defineRelations } from './Relaciones.js';
