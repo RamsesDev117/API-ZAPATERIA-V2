@@ -2,7 +2,6 @@ import express from 'express'
 
 import {
     registrarInventario,
-    obtenerInventarioProducto,
     obtenerInventario
 } from '../controllers/inventarioController.js';
 
