@@ -7,6 +7,7 @@ import './src/models/Usuario.js';
 import './src/models/Rol.js'
 import './src/models/Sucursal.js'
 import './src/models/Empleado.js'
+import './src/models/PrintJobs.js'
 
 import { defineRelations } from './src/models/relaciones.js'
 import loginUsuario from './src/routes/loginRoutes.js'
@@ -14,6 +15,7 @@ import empleadoRoutes from './src/routes/empleadoRoutes.js'
 import usuarioRoutes from './src/routes/usuarioRoutes.js'
 import productoRoutes from './src/routes/productoRoutes.js'
 import inventarioRoutes from './src/routes/inventarioRoutes.js'
+import printerRoutes from './src/routes/printerRoutes.js';
 
 dotenv.config();
 
