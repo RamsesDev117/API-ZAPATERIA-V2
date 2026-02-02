@@ -52,6 +52,7 @@ app.use('/api/v2', empleadoRoutes);
 app.use('/api/v2', usuarioRoutes);
 app.use('/api/v2', productoRoutes);
 app.use('/api/v2', inventarioRoutes);
+app.use('/api/v2', printerRoutes);
 
 // Manejo de errores
 app.use('*', (req, res) => {
