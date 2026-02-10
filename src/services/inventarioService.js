@@ -267,4 +267,66 @@ export class InventarioService {
             throw error;
         }
     }
+
+    // NUEVO MÉTODO: Obtener el stock total consolidado de un producto
+    static async obtenerStockTotalProducto(productoId) {
+        try {
+            // 1. Buscamos todas las tallas asociadas a ese producto
+            const inventarios = await Inventario.findAll({
+                where: {
+                    productoId: productoId
+                },
+                include: [{
+                    model: Producto,
+                    as: 'producto',
+                    attributes: ['id', 'marca', 'modelo', 'color', 'material', 'tipoCalzado', 'sku']
+                }],
+                order: [
+                    ['talla', 'ASC']
+                ]
+            });
+
+            if (!inventarios || inventarios.length === 0) {
+                return {
+                    mensaje: "No se encontró inventario para este producto",
+                    totalGlobal: 0,
+                    producto: null
+                };
+            }
+
+            // 2. Calculamos el total sumando todas las ubicaciones de todas las tallas
+            let totalGlobal = 0;
+            let desglosePorTalla = [];
+
+            inventarios.forEach(item => {
+                // Sumamos lo que hay en bodega y tiendas de esta talla específica
+                const stockTalla = (item.bodegaStock || 0) + (item.tienda1Stock || 0) + (item.tienda2Stock || 0);
+
+                // Lo sumamos al acumulador global
+                totalGlobal += stockTalla;
+
+                // Opcional: Guardamos un mini desglose
+                desglosePorTalla.push({
+                    talla: item.talla,
+                    stock: stockTalla
+                });
+            });
+
+            // 3. Retornamos la estructura limpia
+            // Tomamos los datos del producto del primer registro encontrado
+            const infoProducto = inventarios[0].producto;
+
+            return {
+                producto: infoProducto,
+                totalGlobal: totalGlobal, // ESTE ES EL DATO QUE BUSCAS
+                cantidadVariantes: inventarios.length, // Cuántas tallas diferentes hay
+                desglose: desglosePorTalla // Por si quieres ver cuánto hay de cada uno
+            };
+
+        } catch (error) {
+            console.error('Error en obtenerStockTotalProducto:', error);
+            throw error;
+        }
+    }
+
 }
