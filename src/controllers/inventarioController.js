@@ -104,3 +104,32 @@ export const obtenerInventario = async (req, res) => {
     }
 }
 
+// 
+export const getStockTotalPorProducto = async (req, res) => {
+    try {
+        const { id } = req.params; // Obtenemos el ID de la URL (ej: /inventarios/total/1)
+
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "El ID del producto es requerido"
+            });
+        }
+
+        const data = await InventarioService.obtenerStockTotalProducto(id);
+
+        return res.status(200).json({
+            success: true,
+            data: data
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Error al obtener el total del producto",
+            error: error.message
+        });
+    }
+};
+
