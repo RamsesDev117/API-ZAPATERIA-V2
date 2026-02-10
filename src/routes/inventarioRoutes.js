@@ -2,7 +2,8 @@ import express from 'express'
 
 import {
     registrarInventario,
-    obtenerInventario
+    obtenerInventario,
+    getStockTotalPorProducto
 } from '../controllers/inventarioController.js';
 
 import {
@@ -17,5 +18,8 @@ router.post('/inventarios/create', verificarToken, verificarRol(['BODEGA']), reg
 
 // Ruta para obtener todo el inventario
 router.get('/inventarios/get-all', verificarToken, verificarRol(['BODEGA']), obtenerInventario);
+
+// Ruta para obtener todas las tallas de un zapato
+router.get('/inventarios/producto-total/:id', verificarToken, verificarRol(['BODEGA']), getStockTotalPorProducto);
 
 export default router;
