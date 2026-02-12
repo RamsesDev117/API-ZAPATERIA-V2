@@ -38,7 +38,7 @@ export const obtenerProductos = async (req, res) => {
     }
 }
 
-// Actualizar usuario
+// Actualizar precio
 export const actualizarPrecio = [
     validar(ActualizarPrecioSchema),
     async (req, res) => {
@@ -55,3 +55,35 @@ export const actualizarPrecio = [
         }
     }
 ];
+
+// --- NUEVO MÉTODO: Actualizar información general (Marca, Modelo, etc.) ---
+export const actualizarInfoProducto = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const datos = req.body;
+
+        const producto = await ProductoService.actualizarProducto(id, datos);
+
+        res.status(200).json({
+            success: true,
+            message: 'Información del producto actualizada correctamente',
+            data: producto
+        });
+
+    } catch (error) {
+        // Manejo de errores específicos
+        let statusCode = 400;
+
+        if (error.message.includes('no encontrado')) {
+            statusCode = 404;
+        } else if (error.message.includes('ya existe')) {
+            // Código 409 Conflict: Cuando el SKU generado choca con otro existente
+            statusCode = 409;
+        }
+
+        res.status(statusCode).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
