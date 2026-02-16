@@ -15,6 +15,7 @@ import empleadoRoutes from './src/routes/empleadoRoutes.js'
 import usuarioRoutes from './src/routes/usuarioRoutes.js'
 import productoRoutes from './src/routes/productoRoutes.js'
 import inventarioRoutes from './src/routes/inventarioRoutes.js'
+import entradaRoutes from './src/routes/entradaRoutes.js'
 import printerRoutes from './src/routes/printerRoutes.js';
 
 dotenv.config();
@@ -52,6 +53,7 @@ app.use('/api/v2', empleadoRoutes);
 app.use('/api/v2', usuarioRoutes);
 app.use('/api/v2', productoRoutes);
 app.use('/api/v2', inventarioRoutes);
+app.use('/api/v2', entradaRoutes);
 app.use('/api/v2', printerRoutes);
 
 // Manejo de errores
