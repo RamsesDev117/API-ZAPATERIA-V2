@@ -4,34 +4,59 @@ import { PrintJob } from '../models/PrintJobs.js'; // Asegúrate que la ruta sea
 // 1. Recibe la orden desde el Frontend (React)
 export const crearOrdenImpresion = async (req, res) => {
     try {
-        const { listaEtiquetas } = req.body;
+        // Ahora esperamos un objeto 'payload' completo o 'listaEtiquetas' por compatibilidad
+        const { listaEtiquetas, tipo_etiqueta, datos } = req.body;
 
-        // Validaciones básicas
-        if (!listaEtiquetas || !Array.isArray(listaEtiquetas) || listaEtiquetas.length === 0) {
+        let dataAGuardar = [];
+
+        // CASO 1: Frontend envía el formato antiguo (Array directo de etiquetas de caja)
+        if (listaEtiquetas && Array.isArray(listaEtiquetas)) {
+            // Les inyectamos el tipo por defecto si no lo traen
+            dataAGuardar = listaEtiquetas.map(item => ({
+                ...item,
+                tipo_etiqueta: item.tipo_etiqueta || 'CAJA'
+            }));
+        }
+        // CASO 2: Frontend envía el nuevo formato (Objeto con configuración)
+        else if (datos) {
+            // Si es un objeto único (ej. una etiqueta colgante), lo envolvemos en array
+            if (!Array.isArray(datos)) {
+                dataAGuardar = [{
+                    ...datos,
+                    tipo_etiqueta: tipo_etiqueta || 'CAJA'
+                }];
+            } else {
+                dataAGuardar = datos.map(item => ({
+                    ...item,
+                    tipo_etiqueta: tipo_etiqueta || item.tipo_etiqueta || 'CAJA'
+                }));
+            }
+        }
+        else {
             return res.status(400).json({
                 success: false,
-                message: "La lista de etiquetas es inválida o está vacía."
+                message: "Formato de datos inválido. Se requiere 'listaEtiquetas' o 'datos'."
             });
         }
 
-        // GUARDAR en la base de datos (Cola de impresión)
-        // Sequelize guardará el array automáticamente en el campo JSON
+        // GUARDAR EN BD
+        // Guardamos el array procesado en el campo JSON 'data'
         const nuevoTrabajo = await PrintJob.create({
-            data: listaEtiquetas,
+            data: dataAGuardar,
             status: 'PENDING'
         });
 
         return res.status(200).json({
             success: true,
-            message: "Orden enviada a la cola de impresión.",
+            message: "Orden enviada a la cola.",
             jobId: nuevoTrabajo.id
         });
 
     } catch (error) {
-        console.error("Error al crear orden de impresión:", error);
+        console.error("Error al crear orden:", error);
         return res.status(500).json({
             success: false,
-            message: "Error interno al guardar la orden.",
+            message: "Error interno.",
             error: error.message
         });
     }
