@@ -12,23 +12,21 @@ import {
 
 const router = Router();
 
-// POST http://localhost:4000/api/v2/entradas/registrar
+// ==========================================
+// Prefijo global en server.js: /api/v2
+// ==========================================
+
+// 1. REGISTRAR
+// Ruta final: /api/v2/entradas/registrar
 router.post('/entradas/registrar', verificarToken, verificarRol(['BODEGA']), registrarEntrada);
 
-/**
- * @route   GET /api/v2/entradas
- * @desc    Obtiene el historial de entradas.
- * @query   ?tipo=RESURTIDO (Opcional)
- * @query   ?fecha=2024-02-16 (Opcional - Fecha exacta)
- * @query   ?fechaInicio=2024-02-01&fechaFin=2024-02-28 (Opcional - Rango)
- */
-router.get('/entradas/get-entradas', verificarToken, verificarRol(['BODEGA']), getEntradas);
+// 2. OBTENER HISTORIAL (GET)
+// Ruta final: /api/v2/entradas
+// Nota: Quitamos el "/get-entradas" redundante.
+router.get('/entradas', verificarToken, verificarRol(['BODEGA']), getEntradas);
 
-/**
- * @route   GET /api/v2/entradas/:id
- * @desc    Obtiene el detalle completo de una entrada específica por su ID
- * Incluye los productos y tallas de esa factura/lote.
- */
-router.get('/entradas/get-entradas/:id', verificarToken, verificarRol(['BODEGA']), getEntradaById);
+// 3. OBTENER DETALLE POR ID
+// Ruta final: /api/v2/entradas/:id
+router.get('/entradas/:id', verificarToken, verificarRol(['BODEGA']), getEntradaById);
 
 export default router;
