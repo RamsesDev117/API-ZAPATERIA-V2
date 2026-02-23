@@ -209,7 +209,6 @@ export class InventarioService {
         return !!inventario;
     }
 
-    // Metodo para obtener todos los inventarios
     // Nuevo método para obtener todo el inventario
     static async obtenerTodoElInventario() {
         try {
@@ -325,6 +324,66 @@ export class InventarioService {
 
         } catch (error) {
             console.error('Error en obtenerStockTotalProducto:', error);
+            throw error;
+        }
+    }
+
+    // NUEVO MÉTODO PARA EL PUNTO DE VENTA (Escanear Código)
+    static async buscarPorEscaneo(codigoStr) {
+        try {
+            const codigo = codigoStr.trim();
+
+            // 1. Intentar buscar por SKU EXACTO DE TALLA (Ej: AGA-610-NEG-CHA-24)
+            const inventario = await Inventario.findOne({
+                where: { skuTalla: codigo },
+                include: [{
+                    model: Producto,
+                    as: 'producto',
+                    attributes: ['id', 'marca', 'modelo', 'color', 'material', 'precio', 'activo']
+                }]
+            });
+
+            if (inventario) {
+                if (!inventario.producto.activo) {
+                    throw new Error('El producto está inactivo en el sistema.');
+                }
+                // Retornamos tipo EXACTO. Ya sabemos qué zapato y qué talla es.
+                return {
+                    tipo: 'EXACTO',
+                    data: inventario
+                };
+            }
+
+            // 2. Si no encontró talla, buscar por SKU GENERAL (Ej: AGA-610-NEG-CHA)
+            const producto = await Producto.findOne({
+                where: { sku: codigo }
+            });
+
+            if (producto) {
+                if (!producto.activo) {
+                    throw new Error('El producto está inactivo en el sistema.');
+                }
+
+                // Buscamos qué tallas tiene registradas este producto para que el cajero elija
+                const tallasDisponibles = await Inventario.findAll({
+                    where: { productoId: producto.id },
+                    attributes: ['id', 'talla', 'skuTalla', 'bodegaStock', 'tienda1Stock', 'tienda2Stock'],
+                    order: [['talla', 'ASC']]
+                });
+
+                // Retornamos tipo GENERAL. Sabemos qué zapato es, pero necesitamos preguntar la talla.
+                return {
+                    tipo: 'GENERAL',
+                    data: producto,
+                    tallas: tallasDisponibles
+                };
+            }
+
+            // 3. Si no encuentra en ningún lado
+            throw new Error('Código de barras no encontrado');
+
+        } catch (error) {
+            console.error('Error en buscarPorEscaneo:', error);
             throw error;
         }
     }
