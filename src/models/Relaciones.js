@@ -8,6 +8,7 @@ import { Venta } from "./Venta.js";
 import { DetalleVenta } from "./DetalleVenta.js";
 import { Entrada } from "./Entrada.js";
 import { DetalleEntrada } from "./DetalleEntrada.js";
+import { CorteCaja } from "./CorteCaja.js";
 
 //Definimos nuestras relaciones
 export const defineRelations = () => {
@@ -102,6 +103,22 @@ export const defineRelations = () => {
     DetalleEntrada.belongsTo(Producto, {
         foreignKey: 'producto_id',
         as: 'producto'
+    });
+
+    // Un Empleado (cajero) hace muchos Cortes de Caja
+    Empleado.hasMany(CorteCaja, {
+        foreignKey: 'empleado_id', as: 'cortes_caja'
+    });
+    CorteCaja.belongsTo(Empleado, {
+        foreignKey: 'empleado_id', as: 'cajero'
+    });
+
+    // Una Sucursal tiene muchos Cortes de Caja
+    Sucursal.hasMany(CorteCaja, {
+        foreignKey: 'sucursal_id', as: 'cortes_caja'
+    });
+    CorteCaja.belongsTo(Sucursal, {
+        foreignKey: 'sucursal_id', as: 'sucursal'
     });
 
 }
