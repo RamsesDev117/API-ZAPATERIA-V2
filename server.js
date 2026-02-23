@@ -17,6 +17,7 @@ import productoRoutes from './src/routes/productoRoutes.js'
 import inventarioRoutes from './src/routes/inventarioRoutes.js'
 import entradaRoutes from './src/routes/entradaRoutes.js'
 import printerRoutes from './src/routes/printerRoutes.js';
+import ventaRoutes from './src/routes/ventaRoutes.js';
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use('/api/v2', usuarioRoutes);
 app.use('/api/v2', productoRoutes);
 app.use('/api/v2', inventarioRoutes);
 app.use('/api/v2', entradaRoutes);
+app.use('/api/v2', ventaRoutes);
 app.use('/api/v2', printerRoutes);
 
 // Manejo de errores
