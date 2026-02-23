@@ -117,4 +117,36 @@ export class EmpleadoService {
         return true;
     }
 
+    // Obtener solo empleados activos que pertenecen a una BODEGA
+    static async obtenerEmpleadosBodega() {
+        try {
+            return await Empleado.findAll({
+                where: { estado: 'ACTIVO' },
+                attributes: ['id', 'nombre_completo'], // Solo mandamos lo que el frontend ocupa para el Select
+                include: [{
+                    model: Sucursal,
+                    as: 'sucursal',
+                    where: { tipo: 'BODEGA' }, // ¡Este "where" dentro del "include" hace la magia!
+                    attributes: [] // No necesitamos enviar los datos de la sucursal, solo usamos el inner join
+                }],
+                order: [['nombre_completo', 'ASC']]
+            });
+        } catch (error) {
+            console.error('Error en obtenerEmpleadosBodega:', error);
+            throw error;
+        }
+    }
+
+    // Obtener todas las sucursales (Para el selector de Origen de Stock)
+    static async obtenerSucursales() {
+        try {
+            return await Sucursal.findAll({
+                attributes: ['id', 'nombre', 'tipo'],
+                order: [['id', 'ASC']]
+            });
+        } catch (error) {
+            console.error('Error en obtenerSucursales:', error);
+            throw error;
+        }
+    }
 }
