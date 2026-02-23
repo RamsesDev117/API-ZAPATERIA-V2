@@ -1,9 +1,12 @@
+//src/routes/inventarioRoutes.js
+
 import express from 'express'
 
 import {
     registrarInventario,
     obtenerInventario,
-    getStockTotalPorProducto
+    getStockTotalPorProducto,
+    escanearProducto
 } from '../controllers/inventarioController.js';
 
 import {
@@ -21,5 +24,8 @@ router.get('/inventarios/get-all', verificarToken, verificarRol(['BODEGA']), obt
 
 // Ruta para obtener todas las tallas de un zapato
 router.get('/inventarios/producto-total/:id', verificarToken, verificarRol(['BODEGA']), getStockTotalPorProducto);
+
+// --- NUEVA RUTA PARA EL PUNTO DE VENTA ---
+router.get('/inventarios/escanear/:codigo', verificarToken, verificarRol(['BODEGA', 'TIENDA', 'ADMIN']), escanearProducto);
 
 export default router;
