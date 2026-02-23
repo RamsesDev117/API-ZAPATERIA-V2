@@ -1,3 +1,5 @@
+//src/controller/inventarioController.js
+
 import { InventarioService } from "../services/inventarioService.js";
 
 import {
@@ -128,6 +130,52 @@ export const getStockTotalPorProducto = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Error al obtener el total del producto",
+            error: error.message
+        });
+    }
+};
+
+// NUEVO: Función para buscar producto al escanear en el Punto de Venta
+export const escanearProducto = async (req, res) => {
+    try {
+        const { codigo } = req.params;
+
+        if (!codigo) {
+            return res.status(400).json({
+                success: false,
+                message: "El código de barras o SKU es requerido"
+            });
+        }
+
+        // Llamamos al servicio inteligente que determina si es EXACTO o GENERAL
+        const resultado = await InventarioService.buscarPorEscaneo(codigo);
+
+        return res.status(200).json({
+            success: true,
+            data: resultado
+        });
+
+    } catch (error) {
+        console.error("Error al escanear producto:", error);
+
+        // Manejo de errores específicos
+        if (error.message === 'Código de barras no encontrado') {
+            return res.status(404).json({
+                success: false,
+                message: "No se encontró ningún producto con ese código."
+            });
+        }
+
+        if (error.message === 'El producto está inactivo en el sistema.') {
+            return res.status(400).json({
+                success: false,
+                message: "El producto escaneado está marcado como inactivo."
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Error interno del servidor al procesar el escaneo",
             error: error.message
         });
     }
